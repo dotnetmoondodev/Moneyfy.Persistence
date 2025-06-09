@@ -2,11 +2,19 @@ namespace Persistence;
 
 public static class Constants
 {
-    public const string ConfigFileName = "appsettings.json";
-    public const string DatabaseConnName = "SqlConnection";
+    public static class AppSettings
+    {
+        public const string JsonFileName = "appsettings.json";
+        public const string DBConnName = "SqlConnection";
+    }
 
-    public const string ExpensesCacheKey = "ExpensesCache";
-    public const string IncomesCacheKey = "IncomesCache";
-    public const string PaymentsCacheKey = "PaymentsCache";
-    public const string NotificationsCacheKey = "NotificationsCache";
+    public static class CacheSettings
+    {
+        public const long ExpirationTime = 5;
+        public const string Expenses = "ExpensesCache";
+        public const string Incomes = "IncomesCache";
+        public const string Payments = "PaymentsCache";
+        public const string Notifications = "NotificationsCache";
+    }
+
 }

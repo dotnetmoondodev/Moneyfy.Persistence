@@ -12,13 +12,13 @@ internal class AppDbContextFactory: IDesignTimeDbContextFactory<AppDbContext>
 
         var builder = new ConfigurationBuilder()
             .SetBasePath( path )
-            .AddJsonFile( Constants.ConfigFileName );
+            .AddJsonFile( Constants.AppSettings.DBConnName );
 
         var config = builder.Build();
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
         optionsBuilder.UseSqlServer(
-            config.GetConnectionString( Constants.DatabaseConnName ) );
+            config.GetConnectionString( Constants.AppSettings.DBConnName ) );
         return new AppDbContext( optionsBuilder.Options );
     }
 }

@@ -17,8 +17,8 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration )
     {
-        var connectionString = configuration.GetConnectionString( Constants.DatabaseConnName ) ??
-            throw new InvalidOperationException( $"Connection string '{Constants.DatabaseConnName}' is not configured." );
+        var connectionString = configuration.GetConnectionString( Constants.AppSettings.DBConnName ) ??
+            throw new InvalidOperationException( $"Connection string '{Constants.AppSettings.DBConnName}' is not configured." );
 
         services.AddDbContext<AppDbContext>( options =>
             options.UseSqlServer( connectionString,
