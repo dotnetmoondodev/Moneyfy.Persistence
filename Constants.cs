@@ -17,4 +17,12 @@ public static class Constants
         public const string Notifications = "NotificationsCache";
     }
 
+    public static class LoggerSettings
+    {
+        public const string ExpensesFileName = "expe-webapi";
+        public const string IncomesFileName = "inco-webapi";
+        public const string PaymentsFileName = "paym-webapi";
+        public const string NotificationsFileName = "noti-webapi";
+    }
+
 }

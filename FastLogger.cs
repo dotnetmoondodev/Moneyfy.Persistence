@@ -7,12 +7,6 @@ public static class WebApiLoggerCategories
     public const string Category = "Moneyfy";
 }
 
-public static class WebApiLoggerConfiguration
-{
-    public const string ExpensesFileName = "Expenses-WebApi";
-    public const string IncomesFileName = "Incomes-WebApi";
-}
-
 public static class FastLogger
 {
     /// <summary>
