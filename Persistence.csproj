@@ -4,12 +4,14 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>Moneyfy.Persistence</AssemblyName>
+        <RootNamespace>Persistence</RootNamespace>
         <Authors>MoonDoDev - Hector Gomez</Authors>
         <Version>1.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Moneyfy.Application\Moneyfy.Application.csproj" />
+        <ProjectReference Include="..\Application\Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>
