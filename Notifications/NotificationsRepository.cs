@@ -1,10 +1,10 @@
-using Application.Abstractions;
+using Application.Notifications;
 using Domain.Notifications;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence.Repositories;
+namespace Persistence.Notifications;
 
-internal class NotificationsRepository(
+public sealed class NotificationsRepository(
     IAppDbContext appDbContext )
     : INotificationsRepository
 {

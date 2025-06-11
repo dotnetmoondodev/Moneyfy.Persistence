@@ -1,10 +1,10 @@
-using Application.Abstractions;
+using Application.Incomes;
 using Domain.Incomes;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence.Repositories;
+namespace Persistence.Incomes;
 
-internal class IncomesRepository(
+public sealed class IncomesRepository(
     IAppDbContext appDbContext )
     : IIncomesRepository
 {

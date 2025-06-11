@@ -2,6 +2,8 @@ namespace Persistence;
 
 public static class Constants
 {
+    public const string ThisAssemblyName = "Persistence";
+
     public static class AppSettings
     {
         public const string JsonFileName = "appsettings.json";
@@ -25,4 +27,11 @@ public static class Constants
         public const string NotificationsFileName = "noti-webapi";
     }
 
+    public static class HealthCheckSettings
+    {
+        public const string Query = "select 1;";
+        public const string Name = "Sql-Server";
+        public static readonly IEnumerable<string> Tags = ["ready"];
+        public const long TimeoutSeconds = 5;
+    }
 }

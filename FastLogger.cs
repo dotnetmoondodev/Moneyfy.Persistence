@@ -1,6 +1,6 @@
-namespace Persistence;
-
 using Microsoft.Extensions.Logging;
+
+namespace Persistence;
 
 public static class WebApiLoggerCategories
 {

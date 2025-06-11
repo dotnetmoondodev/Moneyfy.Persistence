@@ -1,43 +1,36 @@
-using Application.Abstractions;
-using Domain.Expenses;
+using Application.Incomes;
 using Domain.Incomes;
-using Domain.Notifications;
-using Domain.Payments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Persistence.Repositories;
 
-namespace Persistence;
+namespace Persistence.Incomes;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPersistence(
+    public static IServiceCollection AddPersistenceServices(
         this IServiceCollection services,
         IConfiguration configuration )
     {
         var connectionString = configuration.GetConnectionString( Constants.AppSettings.DBConnName ) ??
             throw new InvalidOperationException( $"Connection string '{Constants.AppSettings.DBConnName}' is not configured." );
 
-        services.AddDbContext<AppDbContext>( options =>
+        services.AddDbContext<IncomesDbContext>( options =>
             options.UseSqlServer( connectionString,
-                opt => opt.MigrationsAssembly( "Persistence" ) ) );
+                opt => opt.MigrationsAssembly( Constants.ThisAssemblyName ) ) );
 
-        services.AddScoped<IAppDbContext>( provider => provider.GetRequiredService<AppDbContext>() );
-        services.AddScoped<IExpensesRepository, ExpensesRepository>();
+        services.AddScoped<IAppDbContext>( provider => provider.GetRequiredService<IncomesDbContext>() );
         services.AddScoped<IIncomesRepository, IncomesRepository>();
-        services.AddScoped<IPaymentsRepository, PaymentsRepository>();
-        services.AddScoped<INotificationsRepository, NotificationsRepository>();
 
         services.AddHealthChecks().AddSqlServer(
             connectionString,
-            "select 1;",
+            Constants.HealthCheckSettings.Query,
             null,
-            "Sql-Server",
+            Constants.HealthCheckSettings.Name,
             HealthStatus.Unhealthy,
-            ["ready"],
-            TimeSpan.FromSeconds( 5 ) );
+            Constants.HealthCheckSettings.Tags,
+            TimeSpan.FromSeconds( Constants.HealthCheckSettings.TimeoutSeconds ) );
 
         services.AddMemoryCache();
 

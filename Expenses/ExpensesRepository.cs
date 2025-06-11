@@ -1,8 +1,8 @@
-using Application.Abstractions;
+using Application.Expenses;
 using Domain.Expenses;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence.Repositories;
+namespace Persistence.Expenses;
 
 public sealed class ExpensesRepository(
     IAppDbContext appDbContext )

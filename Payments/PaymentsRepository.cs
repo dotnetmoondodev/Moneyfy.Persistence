@@ -1,10 +1,10 @@
-using Application.Abstractions;
+using Application.Payments;
 using Domain.Payments;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence.Repositories;
+namespace Persistence.Payments;
 
-internal class PaymentsRepository(
+public sealed class PaymentsRepository(
     IAppDbContext appDbContext )
     : IPaymentsRepository
 {

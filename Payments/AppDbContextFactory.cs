@@ -2,23 +2,24 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace Persistence.Repositories;
+namespace Persistence.Payments;
 
-internal class AppDbContextFactory: IDesignTimeDbContextFactory<AppDbContext>
+internal class AppDbContextFactory: IDesignTimeDbContextFactory<PaymentsDbContext>
 {
-    public AppDbContext CreateDbContext( string[] args )
+    public PaymentsDbContext CreateDbContext( string[] args )
     {
         var path = AppDomain.CurrentDomain.BaseDirectory;
 
         var builder = new ConfigurationBuilder()
             .SetBasePath( path )
-            .AddJsonFile( Constants.AppSettings.DBConnName );
+            .AddJsonFile( Constants.AppSettings.JsonFileName );
 
         var config = builder.Build();
-        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<PaymentsDbContext>();
 
         optionsBuilder.UseSqlServer(
             config.GetConnectionString( Constants.AppSettings.DBConnName ) );
-        return new AppDbContext( optionsBuilder.Options );
+
+        return new PaymentsDbContext( optionsBuilder.Options );
     }
 }
