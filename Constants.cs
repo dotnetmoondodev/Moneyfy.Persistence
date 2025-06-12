@@ -3,12 +3,7 @@ namespace Persistence;
 public static class Constants
 {
     public const string ThisAssemblyName = "Persistence";
-
-    public static class AppSettings
-    {
-        public const string JsonFileName = "appsettings.json";
-        public const string DBConnName = "SqlConnection";
-    }
+    public const string JsonFileName = "appsettings.json";
 
     public static class CacheSettings
     {
@@ -17,14 +12,6 @@ public static class Constants
         public const string Incomes = "IncomesCache";
         public const string Payments = "PaymentsCache";
         public const string Notifications = "NotificationsCache";
-    }
-
-    public static class LoggerSettings
-    {
-        public const string ExpensesFileName = "expe-webapi";
-        public const string IncomesFileName = "inco-webapi";
-        public const string PaymentsFileName = "paym-webapi";
-        public const string NotificationsFileName = "noti-webapi";
     }
 
     public static class HealthCheckSettings

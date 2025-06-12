@@ -1,3 +1,4 @@
+using Application;
 using Application.Payments;
 using Domain.Payments;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +14,8 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration )
     {
-        var connectionString = configuration.GetConnectionString( Constants.AppSettings.DBConnName ) ??
-            throw new InvalidOperationException( $"Connection string '{Constants.AppSettings.DBConnName}' is not configured." );
+        var connectionString = configuration.GetValue<string>( ApiSettings.DBConnection ) ??
+            throw new InvalidOperationException( $"Connection string '{ApiSettings.DBConnection}' is not configured." );
 
         services.AddDbContext<PaymentsDbContext>( options =>
             options.UseSqlServer( connectionString,

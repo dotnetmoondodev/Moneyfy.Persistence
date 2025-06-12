@@ -1,9 +1,15 @@
+using Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 namespace Persistence.Notifications;
 
+/// <summary>
+/// Factory for creating instances of <see cref="NotificationsDbContext"/> at design time.
+/// IMPORTANT: The configuration file "appsettings.json" must have the connection string
+/// under the key specified in <see cref="ApiSettings.DBConnection"/>.
+/// </summary>
 internal class AppDbContextFactory: IDesignTimeDbContextFactory<NotificationsDbContext>
 {
     public NotificationsDbContext CreateDbContext( string[] args )
@@ -12,14 +18,12 @@ internal class AppDbContextFactory: IDesignTimeDbContextFactory<NotificationsDbC
 
         var builder = new ConfigurationBuilder()
             .SetBasePath( path )
-            .AddJsonFile( Constants.AppSettings.JsonFileName );
+            .AddJsonFile( Constants.JsonFileName );
 
         var config = builder.Build();
         var optionsBuilder = new DbContextOptionsBuilder<NotificationsDbContext>();
 
-        optionsBuilder.UseSqlServer(
-            config.GetConnectionString( Constants.AppSettings.DBConnName ) );
-
+        optionsBuilder.UseSqlServer( config.GetValue<string>( ApiSettings.DBConnection )! );
         return new NotificationsDbContext( optionsBuilder.Options );
     }
 }
