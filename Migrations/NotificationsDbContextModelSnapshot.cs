@@ -8,7 +8,7 @@ using Persistence.Notifications;
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Persistence.Migrations.NotificationsDb
 {
     [DbContext( typeof( NotificationsDbContext ) )]
     partial class NotificationsDbContextModelSnapshot: ModelSnapshot
@@ -29,10 +29,10 @@ namespace Persistence.Migrations
                         .HasColumnType( "uniqueidentifier" );
 
                     b.Property<DateTimeOffset>( "CreationDate" )
-                        .HasColumnType( "datetimeoffset" );
+                        .HasColumnType( "datetime" );
 
                     b.Property<DateTimeOffset>( "DateToSend" )
-                        .HasColumnType( "datetimeoffset" );
+                        .HasColumnType( "datetime" );
 
                     b.Property<string>( "Description" )
                         .IsRequired()
@@ -43,8 +43,8 @@ namespace Persistence.Migrations
                         .HasMaxLength( 128 )
                         .HasColumnType( "nvarchar(128)" );
 
-                    b.Property<bool>( "Enable" )
-                        .HasColumnType( "bit" );
+                    b.Property<int>( "Enable" )
+                        .HasColumnType( "int" );
 
                     b.Property<int>( "Frequency" )
                         .HasColumnType( "int" );
@@ -62,12 +62,57 @@ namespace Persistence.Migrations
                         .HasMaxLength( 32 )
                         .HasColumnType( "nvarchar(32)" );
 
-                    b.Property<bool>( "Repeatable" )
-                        .HasColumnType( "bit" );
+                    b.Property<int>( "Repeatable" )
+                        .HasColumnType( "int" );
 
                     b.HasKey( "Id" );
 
+                    b.HasIndex( "PaymentId" );
+
                     b.ToTable( "Notifications" );
+                } );
+
+            modelBuilder.Entity( "Domain.Payments.Payment", b =>
+                {
+                    b.Property<Guid>( "Id" )
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType( "uniqueidentifier" );
+
+                    b.Property<DateTimeOffset>( "CreationDate" )
+                        .HasColumnType( "datetime" );
+
+                    b.Property<int>( "Currency" )
+                        .HasColumnType( "int" );
+
+                    b.Property<string>( "Description" )
+                        .IsRequired()
+                        .HasMaxLength( 128 )
+                        .HasColumnType( "nvarchar(128)" );
+
+                    b.Property<int>( "IsAutoDebit" )
+                        .HasColumnType( "int" );
+
+                    b.Property<string>( "PaymentMediaReference" )
+                        .IsRequired()
+                        .HasMaxLength( 128 )
+                        .HasColumnType( "nvarchar(128)" );
+
+                    b.Property<decimal>( "Value" )
+                        .HasColumnType( "decimal(18,2)" );
+
+                    b.HasKey( "Id" );
+
+                    b.ToTable( "Payments" );
+                } );
+
+            modelBuilder.Entity( "Domain.Notifications.Notification", b =>
+                {
+                    b.HasOne( "Domain.Payments.Payment", "Payments" )
+                        .WithMany()
+                        .HasForeignKey( "PaymentId" )
+                        .OnDelete( DeleteBehavior.Cascade );
+
+                    b.Navigation( "Payments" );
                 } );
 #pragma warning restore 612, 618
         }

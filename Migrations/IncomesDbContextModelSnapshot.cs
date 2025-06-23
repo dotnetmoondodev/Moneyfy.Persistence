@@ -29,7 +29,7 @@ namespace Persistence.Migrations
                         .HasColumnType( "uniqueidentifier" );
 
                     b.Property<DateTimeOffset>( "CreationDate" )
-                        .HasColumnType( "datetimeoffset" );
+                        .HasColumnType( "datetime" );
 
                     b.Property<string>( "Description" )
                         .IsRequired()

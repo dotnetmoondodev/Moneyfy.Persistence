@@ -16,10 +16,10 @@ namespace Persistence.Migrations
                 {
                     Id = table.Column<Guid>( type: "uniqueidentifier", nullable: false ),
                     Currency = table.Column<int>( type: "int", nullable: false ),
-                    IsAutoDebit = table.Column<bool>( type: "bit", nullable: false ),
+                    IsAutoDebit = table.Column<int>( type: "int", nullable: false ),
                     PaymentMediaReference = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
                     Description = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
-                    CreationDate = table.Column<DateTimeOffset>( type: "datetimeoffset", nullable: false ),
+                    CreationDate = table.Column<DateTimeOffset>( type: "datetime", nullable: false ),
                     Value = table.Column<decimal>( type: "decimal(18,2)", nullable: false )
                 },
                 constraints: table =>

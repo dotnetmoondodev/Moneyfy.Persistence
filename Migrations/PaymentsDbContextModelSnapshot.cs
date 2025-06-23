@@ -29,7 +29,7 @@ namespace Persistence.Migrations
                         .HasColumnType( "uniqueidentifier" );
 
                     b.Property<DateTimeOffset>( "CreationDate" )
-                        .HasColumnType( "datetimeoffset" );
+                        .HasColumnType( "datetime" );
 
                     b.Property<int>( "Currency" )
                         .HasColumnType( "int" );
@@ -39,8 +39,8 @@ namespace Persistence.Migrations
                         .HasMaxLength( 128 )
                         .HasColumnType( "nvarchar(128)" );
 
-                    b.Property<bool>( "IsAutoDebit" )
-                        .HasColumnType( "bit" );
+                    b.Property<int>( "IsAutoDebit" )
+                        .HasColumnType( "int" );
 
                     b.Property<string>( "PaymentMediaReference" )
                         .IsRequired()

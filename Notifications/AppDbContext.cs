@@ -14,7 +14,7 @@ public class NotificationsDbContext( DbContextOptions options ): DbContext( opti
         {
             entity.HasKey( n => n.Id );
             entity.Property( p => p.Description ).IsRequired().HasMaxLength( 128 );
-            entity.Property( p => p.DateToSend ).IsRequired().HasColumnType( "datetimeoffset" );
+            entity.Property( p => p.DateToSend ).IsRequired().HasColumnType( "datetime" );
             entity.Property( p => p.HourToSend ).IsRequired();
             entity.Property( p => p.Frequency ).IsRequired();
             entity.Property( p => p.Method ).IsRequired();
@@ -24,6 +24,12 @@ public class NotificationsDbContext( DbContextOptions options ): DbContext( opti
             entity.Property( p => p.Email ).HasMaxLength( 128 );
             entity.Property( p => p.PhoneNumber ).HasMaxLength( 32 );
         } );
+
+        modelBuilder.Entity<Notification>()
+            .HasOne( n => n.Payment )
+            .WithMany()
+            .HasForeignKey( n => n.PaymentId )
+            .OnDelete( DeleteBehavior.Cascade );
     }
 
     public override async Task<int> SaveChangesAsync( CancellationToken cancellationToken = default )

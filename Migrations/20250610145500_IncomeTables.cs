@@ -18,7 +18,7 @@ namespace Persistence.Migrations
                     Source = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
                     Withholding = table.Column<decimal>( type: "decimal(18,2)", nullable: false ),
                     Description = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
-                    CreationDate = table.Column<DateTimeOffset>( type: "datetimeoffset", nullable: false ),
+                    CreationDate = table.Column<DateTimeOffset>( type: "datetime", nullable: false ),
                     Value = table.Column<decimal>( type: "decimal(18,2)", nullable: false )
                 },
                 constraints: table =>
