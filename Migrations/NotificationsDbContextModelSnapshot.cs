@@ -8,7 +8,7 @@ using Persistence.Notifications;
 
 #nullable disable
 
-namespace Persistence.Migrations.NotificationsDb
+namespace Persistence.Migrations
 {
     [DbContext( typeof( NotificationsDbContext ) )]
     partial class NotificationsDbContextModelSnapshot: ModelSnapshot
@@ -28,11 +28,11 @@ namespace Persistence.Migrations.NotificationsDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType( "uniqueidentifier" );
 
-                    b.Property<DateTimeOffset>( "CreationDate" )
-                        .HasColumnType( "datetime" );
+                    b.Property<DateTime>( "CreationDate" )
+                        .HasColumnType( "datetime2" );
 
-                    b.Property<DateTimeOffset>( "DateToSend" )
-                        .HasColumnType( "datetime" );
+                    b.Property<DateTime>( "DateToSend" )
+                        .HasColumnType( "datetime2" );
 
                     b.Property<string>( "Description" )
                         .IsRequired()
@@ -78,8 +78,8 @@ namespace Persistence.Migrations.NotificationsDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType( "uniqueidentifier" );
 
-                    b.Property<DateTimeOffset>( "CreationDate" )
-                        .HasColumnType( "datetime" );
+                    b.Property<DateTime>( "CreationDate" )
+                        .HasColumnType( "datetime2" );
 
                     b.Property<int>( "Currency" )
                         .HasColumnType( "int" );
@@ -107,12 +107,12 @@ namespace Persistence.Migrations.NotificationsDb
 
             modelBuilder.Entity( "Domain.Notifications.Notification", b =>
                 {
-                    b.HasOne( "Domain.Payments.Payment", "Payments" )
+                    b.HasOne( "Domain.Payments.Payment", "Payment" )
                         .WithMany()
                         .HasForeignKey( "PaymentId" )
                         .OnDelete( DeleteBehavior.Cascade );
 
-                    b.Navigation( "Payments" );
+                    b.Navigation( "Payment" );
                 } );
 #pragma warning restore 612, 618
         }

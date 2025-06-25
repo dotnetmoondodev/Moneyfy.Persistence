@@ -16,7 +16,7 @@ namespace Persistence.Migrations
                 {
                     Id = table.Column<Guid>( type: "uniqueidentifier", nullable: false ),
                     Description = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
-                    CreationDate = table.Column<DateTimeOffset>( type: "datetime", nullable: false ),
+                    CreationDate = table.Column<DateTime>( type: "datetime2", nullable: false ),
                     Value = table.Column<decimal>( type: "decimal(18,2)", nullable: false )
                 },
                 constraints: table =>

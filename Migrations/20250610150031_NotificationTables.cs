@@ -19,7 +19,7 @@ namespace Persistence.Migrations
                     IsAutoDebit = table.Column<int>( type: "int", nullable: false ),
                     PaymentMediaReference = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
                     Description = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
-                    CreationDate = table.Column<DateTimeOffset>( type: "datetime", nullable: false ),
+                    CreationDate = table.Column<DateTime>( type: "datetime2", nullable: false ),
                     Value = table.Column<decimal>( type: "decimal(18,2)", nullable: false )
                 },
                 constraints: table =>
@@ -32,7 +32,7 @@ namespace Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>( type: "uniqueidentifier", nullable: false ),
-                    DateToSend = table.Column<DateTimeOffset>( type: "datetime", nullable: false ),
+                    DateToSend = table.Column<DateTime>( type: "datetime2", nullable: false ),
                     HourToSend = table.Column<int>( type: "int", nullable: false ),
                     Frequency = table.Column<int>( type: "int", nullable: false ),
                     Method = table.Column<int>( type: "int", nullable: false ),
@@ -42,13 +42,13 @@ namespace Persistence.Migrations
                     Email = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: true ),
                     PhoneNumber = table.Column<string>( type: "nvarchar(32)", maxLength: 32, nullable: true ),
                     Description = table.Column<string>( type: "nvarchar(128)", maxLength: 128, nullable: false ),
-                    CreationDate = table.Column<DateTimeOffset>( type: "datetime", nullable: false )
+                    CreationDate = table.Column<DateTime>( type: "datetime2", nullable: false )
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey( "PK_Notifications", x => x.Id );
                     table.ForeignKey(
-                        name: "FK_Notifications_Payment_PaymentId",
+                        name: "FK_Notifications_Payments_PaymentId",
                         column: x => x.PaymentId,
                         principalTable: "Payments",
                         principalColumn: "Id",
