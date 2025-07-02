@@ -1,5 +1,4 @@
 using Application;
-using Application.Notifications;
 using Domain.Notifications;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +24,7 @@ public static class DependencyInjection
         services.AddSingleton( serviceProvider =>
         {
             var mongoClient = new MongoClient( connectionString );
-            return mongoClient.GetDatabase( nameof( ApiEndpoints.Notifications ) );
+            return mongoClient.GetDatabase( Constants.DatabaseName );
         } );
 
         services.AddSingleton<INotificationsRepository>( provider =>

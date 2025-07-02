@@ -3,6 +3,7 @@ namespace Persistence;
 public static class Constants
 {
     public const string JsonFileName = "appsettings.json";
+    public const string DatabaseName = "MoneyfyDB";
 
     public static class CacheSettings
     {

@@ -1,5 +1,4 @@
 using Application;
-using Application.Expenses;
 using Domain.Expenses;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +24,7 @@ public static class DependencyInjection
         services.AddSingleton( serviceProvider =>
         {
             var mongoClient = new MongoClient( connectionString );
-            return mongoClient.GetDatabase( nameof( ApiEndpoints.Expenses ) );
+            return mongoClient.GetDatabase( Constants.DatabaseName );
         } );
 
         services.AddSingleton<IExpensesRepository>( provider =>
