@@ -1,10 +1,12 @@
 using Application;
 using Application.Notifications;
 using Domain.Notifications;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Driver;
 
 namespace Persistence.Notifications;
 
@@ -14,27 +16,31 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration )
     {
+        BsonSerializer.RegisterSerializer( new GuidSerializer( BsonType.String ) );
+        BsonSerializer.RegisterSerializer( new DateTimeSerializer( BsonType.String ) );
+
         var connectionString = configuration.GetValue<string>( ApiSettings.DBConnection ) ??
             throw new InvalidOperationException( $"Connection string '{ApiSettings.DBConnection}' is not configured." );
 
-        services.AddDbContext<NotificationsDbContext>( options =>
-            options.UseSqlServer( connectionString,
-                opt => opt.MigrationsAssembly( Constants.ThisAssemblyName ) ) );
+        services.AddSingleton( serviceProvider =>
+        {
+            var mongoClient = new MongoClient( connectionString );
+            return mongoClient.GetDatabase( nameof( ApiEndpoints.Notifications ) );
+        } );
 
-        services.AddScoped<IAppDbContext>( provider => provider.GetRequiredService<NotificationsDbContext>() );
-        services.AddScoped<INotificationsRepository, NotificationsRepository>();
+        services.AddSingleton<INotificationsRepository>( provider =>
+        {
+            var database = provider.GetService<IMongoDatabase>();
+            return new NotificationsRepository( database! );
+        } );
 
-        services.AddHealthChecks().AddSqlServer(
-            connectionString,
-            Constants.HealthCheckSettings.Query,
-            null,
-            Constants.HealthCheckSettings.Name,
-            HealthStatus.Unhealthy,
-            Constants.HealthCheckSettings.Tags,
-            TimeSpan.FromSeconds( Constants.HealthCheckSettings.TimeoutSeconds ) );
+        services.AddHealthChecks().AddMongoDb( sp =>
+            sp.GetService<IMongoDatabase>()!,
+                name: Constants.HealthCheckSettings.Name,
+                timeout: TimeSpan.FromSeconds( Constants.HealthCheckSettings.TimeoutSeconds ),
+                tags: Constants.HealthCheckSettings.Tags );
 
         services.AddMemoryCache();
-
         return services;
     }
 }
