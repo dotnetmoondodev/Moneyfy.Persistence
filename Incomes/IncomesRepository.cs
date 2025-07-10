@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Incomes;
 using Domain.Incomes;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
@@ -8,7 +9,7 @@ namespace Persistence.Incomes;
 
 public sealed class IncomesRepository(
     IMongoDatabase database )
-    : IIncomesRepository
+    : IRepository<Income>
 {
     private readonly IMongoCollection<Income> _dbCollection =
         database.GetCollection<Income>( nameof( ApiEndpoints.Incomes ) ) ??

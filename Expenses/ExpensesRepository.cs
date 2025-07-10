@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Expenses;
 using Domain.Expenses;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
@@ -8,7 +9,7 @@ namespace Persistence.Expenses;
 
 public sealed class ExpensesRepository(
     IMongoDatabase database )
-    : IExpensesRepository
+    : IRepository<Expense>
 {
     private readonly IMongoCollection<Expense> _dbCollection =
         database.GetCollection<Expense>( nameof( ApiEndpoints.Expenses ) ) ??

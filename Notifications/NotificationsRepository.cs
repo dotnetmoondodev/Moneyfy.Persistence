@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Notifications;
 using Domain.Notifications;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
@@ -8,7 +9,7 @@ namespace Persistence.Notifications;
 
 public sealed class NotificationsRepository(
     IMongoDatabase database )
-    : INotificationsRepository
+    : IRepository<Notification>
 {
     private readonly IMongoCollection<Notification> _dbCollection =
         database.GetCollection<Notification>( nameof( ApiEndpoints.Notifications ) ) ??

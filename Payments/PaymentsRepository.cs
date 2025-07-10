@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Payments;
 using Domain.Payments;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
@@ -8,7 +9,7 @@ namespace Persistence.Payments;
 
 public sealed class PaymentsRepository(
     IMongoDatabase database )
-    : IPaymentsRepository
+    : IRepository<Payment>
 {
     private readonly IMongoCollection<Payment> _dbCollection =
         database.GetCollection<Payment>( nameof( ApiEndpoints.Payments ) ) ??
