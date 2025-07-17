@@ -19,11 +19,20 @@ public static class CommonDependencies
     {
         if ( isProduction )
         {
+            /* To work locally with Docker this value should be Empty */
             var keyName = configBuilder.Build().GetValue<string>( ApiSettings.KeyVaultName );
-            configBuilder.AddAzureKeyVault(
-                 new Uri( $"https://{keyName}.vault.azure.net/" ),
-                 new DefaultAzureCredential()
-            );
+
+            if ( string.IsNullOrEmpty( keyName!.Trim() ) )
+            {
+                configBuilder.AddEnvironmentVariables();
+            }
+            else
+            {
+                configBuilder.AddAzureKeyVault(
+                     new Uri( $"https://{keyName}.vault.azure.net/" ),
+                     new DefaultAzureCredential()
+                );
+            }
         }
         else
         {
