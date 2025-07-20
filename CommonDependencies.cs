@@ -17,47 +17,51 @@ public static class CommonDependencies
         IConfigurationBuilder configBuilder,
         bool isProduction )
     {
+        configBuilder.AddEnvironmentVariables();
+        var config = configBuilder.Build();
+
+        /* To work locally with Docker this value should be Empty */
+        var keyVault = config.GetValue<string>( ApiSettings.KeyVaultName );
+
         if ( isProduction )
         {
-            /* To work locally with Docker this value should be Empty */
-            var keyName = configBuilder.Build().GetValue<string>( ApiSettings.KeyVaultName );
-
-            if ( string.IsNullOrEmpty( keyName!.Trim() ) )
-            {
-                configBuilder.AddEnvironmentVariables();
-            }
-            else
+            if ( !string.IsNullOrEmpty( keyVault!.Trim() ) )
             {
                 configBuilder.AddAzureKeyVault(
-                     new Uri( $"https://{keyName}.vault.azure.net/" ),
+                     new Uri( $"https://{keyVault}.vault.azure.net/" ),
                      new DefaultAzureCredential()
                 );
+
+                config = configBuilder.Build();
             }
         }
-        else
-        {
-            configBuilder.AddEnvironmentVariables();
-        }
-
-        var config = configBuilder.Build();
 
         var logLevel = config.GetValue<string>( LoggerSettings.Default );
         var environment = isProduction ? "PRD" : "DEV";
 
-        Console.WriteLine( $"Current LogLevel: {logLevel}( {environment} )" );
-
+        Console.WriteLine( $"LogLevel=[{logLevel}], Env=[{environment}], Key=[{keyVault}]" );
         services.AddLogging( loggingBuilder =>
             loggingBuilder.SetMinimumLevel( LoggerSettings.GetLogLevel( logLevel ) ).AddConsole() );
+
+        /* Important validations to make here before continue */
+        var settingsValue = config.GetValue<string>( ApiSettings.Authority );
+        ArgumentNullException.ThrowIfNullOrEmpty( settingsValue!.Trim(), nameof( ApiSettings.Authority ) );
+        Console.WriteLine( $"{nameof( ApiSettings.Authority )}=[{ApiSettings.MaskStrValue( settingsValue )}]" );
+
+        settingsValue = config.GetValue<string>( ApiSettings.Audience );
+        ArgumentNullException.ThrowIfNullOrEmpty( settingsValue!.Trim(), nameof( ApiSettings.Audience ) );
+        Console.WriteLine( $"{nameof( ApiSettings.Audience )}=[{ApiSettings.MaskStrValue( settingsValue )}]" );
+
+        settingsValue = config.GetValue<string>( ApiSettings.DBConnection );
+        ArgumentNullException.ThrowIfNullOrEmpty( settingsValue!.Trim(), nameof( ApiSettings.DBConnection ) );
+        Console.WriteLine( $"{nameof( ApiSettings.DBConnection )}=[{ApiSettings.MaskStrValue( settingsValue )}]" );
 
         BsonSerializer.RegisterSerializer( new GuidSerializer( BsonType.String ) );
         BsonSerializer.RegisterSerializer( new DateTimeSerializer( BsonType.String ) );
 
-        var connectionString = config.GetValue<string>( ApiSettings.DBConnection ) ??
-            throw new InvalidOperationException( $"Connection string '{ApiSettings.DBConnection}' is not configured." );
-
         services.AddSingleton( serviceProvider =>
         {
-            var mongoClient = new MongoClient( connectionString );
+            var mongoClient = new MongoClient( settingsValue );
             return mongoClient.GetDatabase( Constants.DatabaseName );
         } );
 
