@@ -1,8 +1,9 @@
-using Application;
+using Application.Settings;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.Configuration;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -18,50 +19,40 @@ public static class CommonDependencies
         bool isProduction )
     {
         configBuilder.AddEnvironmentVariables();
-        var config = configBuilder.Build();
 
-        /* To work locally with Docker this value should be Empty */
-        var keyVault = config.GetValue<string>( ApiSettings.KeyVaultName );
+        var config = configBuilder.Build();
+        var settings = config.GetSection( nameof( WebApiSettings ) ).Get<WebApiSettings>();
 
         if ( isProduction )
         {
-            if ( !string.IsNullOrEmpty( keyVault!.Trim() ) )
+            /* To work locally with Docker this value should be Empty */
+            if ( !string.IsNullOrEmpty( settings!.KeyVaultName!.Trim() ) )
             {
                 configBuilder.AddAzureKeyVault(
-                     new Uri( $"https://{keyVault}.vault.azure.net/" ),
+                     new Uri( $"https://{settings.KeyVaultName}.vault.azure.net/" ),
                      new DefaultAzureCredential()
                 );
 
                 config = configBuilder.Build();
+                settings = config.GetSection( nameof( WebApiSettings ) ).Get<WebApiSettings>();
             }
         }
 
-        var logLevel = config.GetValue<string>( LoggerSettings.Default );
-        var environment = isProduction ? "PRD" : "DEV";
-
-        Console.WriteLine( $"LogLevel=[{logLevel}], Env=[{environment}], Key=[{keyVault}]" );
-        services.AddLogging( loggingBuilder =>
-            loggingBuilder.SetMinimumLevel( LoggerSettings.GetLogLevel( logLevel ) ).AddConsole() );
+        var environment = isProduction ? "Production" : "Development";
+        Console.WriteLine( $"Environment( {environment} ), KeyVaultName( {settings!.KeyVaultName} )" );
 
         /* Important validations to make here before continue */
-        var settingsValue = config.GetValue<string>( ApiSettings.Authority );
-        ArgumentNullException.ThrowIfNullOrEmpty( settingsValue!.Trim(), nameof( ApiSettings.Authority ) );
-        Console.WriteLine( $"{nameof( ApiSettings.Authority )}=[{ApiSettings.MaskStrValue( settingsValue )}]" );
+        if ( settings is null || !settings.DataIsValid() )
+            throw new InvalidConfigurationException( $"Configuration values: {nameof( WebApiSettings )} aren't defined or invalid." );
 
-        settingsValue = config.GetValue<string>( ApiSettings.Audience );
-        ArgumentNullException.ThrowIfNullOrEmpty( settingsValue!.Trim(), nameof( ApiSettings.Audience ) );
-        Console.WriteLine( $"{nameof( ApiSettings.Audience )}=[{ApiSettings.MaskStrValue( settingsValue )}]" );
-
-        settingsValue = config.GetValue<string>( ApiSettings.DBConnection );
-        ArgumentNullException.ThrowIfNullOrEmpty( settingsValue!.Trim(), nameof( ApiSettings.DBConnection ) );
-        Console.WriteLine( $"{nameof( ApiSettings.DBConnection )}=[{ApiSettings.MaskStrValue( settingsValue )}]" );
+        services.AddLogging( loggingBuilder => loggingBuilder.AddSeq( settings.SeqServerUrl ) );
 
         BsonSerializer.RegisterSerializer( new GuidSerializer( BsonType.String ) );
         BsonSerializer.RegisterSerializer( new DateTimeSerializer( BsonType.String ) );
 
         services.AddSingleton( serviceProvider =>
         {
-            var mongoClient = new MongoClient( settingsValue );
+            var mongoClient = new MongoClient( settings.DBConnection );
             return mongoClient.GetDatabase( Constants.DatabaseName );
         } );
 
