@@ -1,10 +1,10 @@
+namespace Persistence.Incomes;
+
 using Domain.Incomes;
 using Domain;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-
-namespace Persistence.Incomes;
 
 public static class DependencyInjection
 {
@@ -13,7 +13,7 @@ public static class DependencyInjection
         IConfigurationBuilder configuration,
         bool isProduction )
     {
-        services.AddPersistenceCommonServices( configuration, isProduction );
+        services.AddCommonServices( configuration, isProduction );
         services.AddSingleton<IRepository<Income>>( provider =>
         {
             var database = provider.GetService<IMongoDatabase>();

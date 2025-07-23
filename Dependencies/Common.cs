@@ -1,19 +1,14 @@
+namespace Persistence;
+
 using Application.Settings;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.Configuration;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
 
-namespace Persistence;
-
-public static class CommonDependencies
+internal static partial class CommonDependencies
 {
-    public static IServiceCollection AddPersistenceCommonServices(
+    internal static IServiceCollection AddCommonServices(
         this IServiceCollection services,
         IConfigurationBuilder configBuilder,
         bool isProduction )
@@ -45,24 +40,10 @@ public static class CommonDependencies
         if ( settings is null || !settings.DataIsValid() )
             throw new InvalidConfigurationException( $"Configuration values: {nameof( WebApiSettings )} aren't defined or invalid." );
 
-        services.AddLogging( loggingBuilder => loggingBuilder.AddSeq( settings.SeqServerUrl ) );
+        services.AddLoggingServices( settings )
+            .AddMongoDbServices( settings )
+            .AddMemoryCache();
 
-        BsonSerializer.RegisterSerializer( new GuidSerializer( BsonType.String ) );
-        BsonSerializer.RegisterSerializer( new DateTimeSerializer( BsonType.String ) );
-
-        services.AddSingleton( serviceProvider =>
-        {
-            var mongoClient = new MongoClient( settings.DBConnection );
-            return mongoClient.GetDatabase( Constants.DatabaseName );
-        } );
-
-        services.AddHealthChecks().AddMongoDb( sp =>
-            sp.GetService<IMongoDatabase>()!,
-                name: Constants.HealthCheckSettings.Name,
-                timeout: TimeSpan.FromSeconds( Constants.HealthCheckSettings.TimeoutSeconds ),
-                tags: Constants.HealthCheckSettings.Tags );
-
-        services.AddMemoryCache();
         return services;
     }
 }
