@@ -41,6 +41,7 @@ internal static partial class CommonDependencies
             throw new InvalidConfigurationException( $"Configuration values: {nameof( WebApiSettings )} aren't defined or invalid." );
 
         services.AddLoggingServices( settings )
+            .AddTracingServices( settings )
             .AddMongoDbServices( settings )
             .AddMemoryCache();
 
