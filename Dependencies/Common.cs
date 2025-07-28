@@ -34,7 +34,7 @@ internal static partial class CommonDependencies
         }
 
         var environment = isProduction ? "Production" : "Development";
-        Console.WriteLine( $"Environment( {environment} ), KeyVaultName( {settings!.KeyVaultName} )" );
+        Console.WriteLine( $"Environment( {environment} ), ServiceName( {settings!.ServiceName} ), KeyVaultName( {settings!.KeyVaultName} )" );
 
         /* Important validations to make here before continue */
         if ( settings is null || !settings.DataIsValid() )
