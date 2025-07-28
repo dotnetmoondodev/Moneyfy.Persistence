@@ -21,7 +21,11 @@ internal static partial class CommonDependencies
                             .AddService( serviceName: settings.ServiceName! ) )
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddConsoleExporter();
+                    .AddOtlpExporter( options =>
+                    {
+                        options.Endpoint = new Uri( settings.JaegerServerUrl! );
+                        options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                    } );
             } );
 
         return services;
