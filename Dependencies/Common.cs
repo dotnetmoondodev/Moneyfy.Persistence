@@ -35,15 +35,16 @@ internal static partial class CommonDependencies
 
         var environment = isProduction ? "Production" : "Development";
         Console.WriteLine( $"Environment( {environment} ), ServiceName( {settings!.ServiceName} ), KeyVaultName( {settings!.KeyVaultName} )" );
+        Console.WriteLine( $"Seq-Server( {settings!.SeqServerUrl} ), Jaeger-Server( {settings!.JaegerServerUrl} )" );
 
         /* Important validations to make here before continue */
         if ( settings is null || !settings.DataIsValid() )
             throw new InvalidConfigurationException( $"Configuration values: {nameof( WebApiSettings )} aren't defined or invalid." );
 
-        services.AddLoggingServices( settings )
-            .AddTracingServices( settings )
-            .AddMongoDbServices( settings )
-            .AddMemoryCache();
+        services.AddMongoDbServices( settings )
+            .AddMemoryCache()
+            .AddLoggingServices( settings )
+            .AddTracingServices( settings );
 
         return services;
     }
