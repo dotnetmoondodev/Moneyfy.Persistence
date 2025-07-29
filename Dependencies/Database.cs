@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 
 internal static partial class CommonDependencies
 {
@@ -18,7 +19,12 @@ internal static partial class CommonDependencies
 
         services.AddSingleton( serviceProvider =>
         {
-            var mongoClient = new MongoClient( settings.DBConnection );
+            /* We include here the OpenTelemetry Instrumentation for MongoDB */
+            var clientSettings = MongoClientSettings.FromUrl( new MongoUrl( settings.DBConnection ) );
+            var options = new InstrumentationOptions { CaptureCommandText = true };
+            clientSettings.ClusterConfigurator = cb => cb.Subscribe( new DiagnosticsActivityEventSubscriber( options ) );
+
+            var mongoClient = new MongoClient( clientSettings );
             return mongoClient.GetDatabase( Constants.DatabaseName );
         } );
 

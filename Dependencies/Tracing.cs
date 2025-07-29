@@ -12,20 +12,13 @@ internal static partial class CommonDependencies
         WebApiSettings settings )
     {
         services.AddOpenTelemetry()
-            .WithTracing( tracerProviderBuilder =>
+            .ConfigureResource( resource => resource.AddService( settings.ServiceName! ) )
+            .WithTracing( tracing =>
             {
-                tracerProviderBuilder
-                    .AddSource( settings.ServiceName! )
-                    .SetResourceBuilder(
-                        ResourceBuilder.CreateDefault()
-                            .AddService( serviceName: settings.ServiceName! ) )
-                    .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddOtlpExporter( options =>
-                    {
-                        options.Endpoint = new Uri( settings.JaegerServerUrl! );
-                        options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-                    } );
+                tracing.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                tracing.AddOtlpExporter();
             } );
 
         return services;

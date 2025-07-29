@@ -34,8 +34,8 @@ internal static partial class CommonDependencies
         }
 
         var environment = isProduction ? "Production" : "Development";
-        Console.WriteLine( $"Environment( {environment} ), ServiceName( {settings!.ServiceName} ), KeyVaultName( {settings!.KeyVaultName} )" );
-        Console.WriteLine( $"Seq-Server( {settings!.SeqServerUrl} ), Jaeger-Server( {settings!.JaegerServerUrl} )" );
+        Console.WriteLine( $"Environment( {environment} ), ServiceName( {settings!.ServiceName} )" );
+        Console.WriteLine( $"Seq-Server( {settings!.SeqServerUrl} ), KeyVaultName( {settings!.KeyVaultName} )" );
 
         /* Important validations to make here before continue */
         if ( settings is null || !settings.DataIsValid() )
