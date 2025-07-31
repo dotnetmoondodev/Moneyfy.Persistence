@@ -1,6 +1,5 @@
 namespace Persistence;
 
-using Application.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -8,10 +7,10 @@ internal static partial class CommonDependencies
 {
     internal static IServiceCollection AddDatabaseServices(
         this IServiceCollection services,
-        WebApiSettings settings )
+        string dbConnUrl )
     {
         services.AddHealthChecks().AddSqlServer(
-            settings.DBConnection!,
+            dbConnUrl,
             Constants.HealthCheckSettings.Query,
             null,
             Constants.HealthCheckSettings.Name,

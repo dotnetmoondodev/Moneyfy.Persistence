@@ -15,11 +15,15 @@ public static class DependencyInjection
         IConfigurationBuilder configuration,
         IHostEnvironment hostEnvironment )
     {
-        services.AddCommonServices( configuration, hostEnvironment, out var dbConnStr )
-            .AddDbContext<IncomesDbContext>( options =>
-                options.UseSqlServer( dbConnStr, opt => opt.MigrationsAssembly( Constants.ThisAssemblyName ) ) );
+        services.AddCommonServices( configuration, hostEnvironment, out var dbConnStr );
 
-        services.AddScoped<IAppDbContext>( provider => provider.GetRequiredService<IncomesDbContext>() );
+        services.AddDbContext<IncomesDbContext>( options =>
+            options.UseSqlServer( dbConnStr, opt =>
+                opt.MigrationsAssembly( Constants.ThisAssemblyName ) ) );
+
+        services.AddScoped<IAppDbContext>( provider =>
+            provider.GetRequiredService<IncomesDbContext>() );
+
         services.AddScoped<IRepository<Income>, IncomesRepository>();
 
         return services;

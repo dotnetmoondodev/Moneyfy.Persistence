@@ -2,6 +2,7 @@ namespace Persistence;
 
 using Application.Settings;
 using Azure.Identity;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,45 +12,43 @@ internal static partial class CommonDependencies
 {
     internal static IServiceCollection AddCommonServices(
         this IServiceCollection services,
-        IConfigurationBuilder configBuilder,
+        IConfigurationBuilder hostConfigBuilder,
         IHostEnvironment hostEnvironment,
         out string dbConnUrl )
     {
-        configBuilder.AddEnvironmentVariables();
+        hostConfigBuilder.AddEnvironmentVariables();
 
-        var config = configBuilder.Build();
+        var config = hostConfigBuilder.Build();
         var settings = config.GetSection( nameof( WebApiSettings ) ).Get<WebApiSettings>();
-        var environment = "Development";
 
         if ( hostEnvironment.IsProduction() )
         {
-            environment = "Production";
-
             /* To work locally with Docker this value should be Empty */
             if ( !string.IsNullOrEmpty( settings!.KeyVaultName!.Trim() ) )
             {
-                configBuilder.AddAzureKeyVault(
+                hostConfigBuilder.AddAzureKeyVault(
                      new Uri( $"https://{settings.KeyVaultName}.vault.azure.net/" ),
                      new DefaultAzureCredential()
                 );
 
-                config = configBuilder.Build();
+                config = hostConfigBuilder.Build();
                 settings = config.GetSection( nameof( WebApiSettings ) ).Get<WebApiSettings>();
             }
         }
 
-        Console.WriteLine( $"Environment( {environment} ), ServiceName( {settings!.ServiceName} )" );
+        Console.WriteLine( $"Environment( {hostEnvironment.EnvironmentName} ), ServiceName( {hostEnvironment.ApplicationName} )" );
         Console.WriteLine( $"Seq-Server( {settings!.SeqServerUrl} ), KeyVaultName( {settings!.KeyVaultName} )" );
 
         /* Important validations to make here before continue */
         if ( settings is null || !settings.DataIsValid() )
             throw new InvalidConfigurationException( $"Configuration values: {nameof( WebApiSettings )} aren't defined or invalid." );
 
-        services.AddDatabaseServices( settings )
-            .AddLoggingServices( settings )
-            .AddTracingServices( settings );
-
         dbConnUrl = settings.DBConnection!;
+
+        services.AddDatabaseServices( dbConnUrl )
+            .AddLoggingServices( settings!.SeqServerUrl! )
+            .AddTracingServices( hostEnvironment.ApplicationName );
+
         return services;
     }
 }

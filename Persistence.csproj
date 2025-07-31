@@ -22,6 +22,6 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.12.0-beta.2" />
         <PackageReference Include="Seq.Extensions.Logging" Version="8.0.0" />
-        <PackageReference Include="Moneyfy.Application" Version="1.0.10" />
+        <PackageReference Include="Moneyfy.Application" Version="1.0.11" />
     </ItemGroup>
 </Project>

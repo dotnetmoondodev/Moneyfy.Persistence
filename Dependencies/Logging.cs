@@ -1,7 +1,6 @@
 namespace Persistence;
 
 using System.Diagnostics;
-using Application.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,9 +30,11 @@ internal static partial class CommonDependencies
 {
     internal static IServiceCollection AddLoggingServices(
         this IServiceCollection services,
-        WebApiSettings settings )
+        string seqServerUrl )
     {
-        services.AddLogging( loggingBuilder => loggingBuilder.AddSeq( settings.SeqServerUrl ) );
+        services.AddLogging( loggingBuilder =>
+            loggingBuilder.AddSeq( seqServerUrl ) );
+
         return services;
     }
 }

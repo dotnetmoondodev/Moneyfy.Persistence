@@ -2,7 +2,7 @@ namespace Persistence;
 
 public static class Constants
 {
-    public const string ThisAssemblyName = "Persistence";
+    public const string ThisAssemblyName = "Moneyfy.Persistence";
     public const string JsonFileName = "appsettings.json";
 
     public static class CacheSettings

@@ -1,6 +1,5 @@
 namespace Persistence;
 
-using Application.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -9,10 +8,10 @@ internal static partial class CommonDependencies
 {
     internal static IServiceCollection AddTracingServices(
         this IServiceCollection services,
-        WebApiSettings settings )
+        string serviceName )
     {
         services.AddOpenTelemetry()
-            .ConfigureResource( resource => resource.AddService( settings.ServiceName! ) )
+            .ConfigureResource( resource => resource.AddService( serviceName ) )
             .WithTracing( tracing =>
             {
                 tracing.AddAspNetCoreInstrumentation()
