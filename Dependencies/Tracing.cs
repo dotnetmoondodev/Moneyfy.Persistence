@@ -16,7 +16,8 @@ internal static partial class CommonDependencies
             .WithTracing( tracing =>
             {
                 tracing.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation();
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation( opt => opt.SetDbStatementForText = true );
 
                 tracing.AddOtlpExporter();
             } );

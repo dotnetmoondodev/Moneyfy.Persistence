@@ -2,8 +2,8 @@ namespace Persistence;
 
 public static class Constants
 {
+    public const string ThisAssemblyName = "Persistence";
     public const string JsonFileName = "appsettings.json";
-    public const string DatabaseName = "MoneyfyDB";
 
     public static class CacheSettings
     {
@@ -16,7 +16,8 @@ public static class Constants
 
     public static class HealthCheckSettings
     {
-        public const string Name = "MongoDB";
+        public const string Query = "select 1;";
+        public const string Name = "Sql-Server";
         public static readonly IEnumerable<string> Tags = ["ready"];
         public const long TimeoutSeconds = 5;
     }

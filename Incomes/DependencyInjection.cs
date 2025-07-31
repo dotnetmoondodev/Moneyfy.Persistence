@@ -1,24 +1,26 @@
 namespace Persistence.Incomes;
 
-using Domain.Incomes;
+using Application.Incomes;
 using Domain;
+using Domain.Incomes;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
+using Microsoft.Extensions.Hosting;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddPersistenceServices(
         this IServiceCollection services,
         IConfigurationBuilder configuration,
-        bool isProduction )
+        IHostEnvironment hostEnvironment )
     {
-        services.AddCommonServices( configuration, isProduction );
-        services.AddSingleton<IRepository<Income>>( provider =>
-        {
-            var database = provider.GetService<IMongoDatabase>();
-            return new IncomesRepository( database! );
-        } );
+        services.AddCommonServices( configuration, hostEnvironment, out var dbConnStr )
+            .AddDbContext<IncomesDbContext>( options =>
+                options.UseSqlServer( dbConnStr, opt => opt.MigrationsAssembly( Constants.ThisAssemblyName ) ) );
+
+        services.AddScoped<IAppDbContext>( provider => provider.GetRequiredService<IncomesDbContext>() );
+        services.AddScoped<IRepository<Income>, IncomesRepository>();
 
         return services;
     }

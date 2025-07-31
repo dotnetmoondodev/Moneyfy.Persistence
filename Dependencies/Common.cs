@@ -4,6 +4,7 @@ using Application.Settings;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.Configuration;
 
 internal static partial class CommonDependencies
@@ -11,15 +12,19 @@ internal static partial class CommonDependencies
     internal static IServiceCollection AddCommonServices(
         this IServiceCollection services,
         IConfigurationBuilder configBuilder,
-        bool isProduction )
+        IHostEnvironment hostEnvironment,
+        out string dbConnUrl )
     {
         configBuilder.AddEnvironmentVariables();
 
         var config = configBuilder.Build();
         var settings = config.GetSection( nameof( WebApiSettings ) ).Get<WebApiSettings>();
+        var environment = "Development";
 
-        if ( isProduction )
+        if ( hostEnvironment.IsProduction() )
         {
+            environment = "Production";
+
             /* To work locally with Docker this value should be Empty */
             if ( !string.IsNullOrEmpty( settings!.KeyVaultName!.Trim() ) )
             {
@@ -33,7 +38,6 @@ internal static partial class CommonDependencies
             }
         }
 
-        var environment = isProduction ? "Production" : "Development";
         Console.WriteLine( $"Environment( {environment} ), ServiceName( {settings!.ServiceName} )" );
         Console.WriteLine( $"Seq-Server( {settings!.SeqServerUrl} ), KeyVaultName( {settings!.KeyVaultName} )" );
 
@@ -41,11 +45,11 @@ internal static partial class CommonDependencies
         if ( settings is null || !settings.DataIsValid() )
             throw new InvalidConfigurationException( $"Configuration values: {nameof( WebApiSettings )} aren't defined or invalid." );
 
-        services.AddMongoDbServices( settings )
-            .AddMemoryCache()
+        services.AddDatabaseServices( settings )
             .AddLoggingServices( settings )
             .AddTracingServices( settings );
 
+        dbConnUrl = settings.DBConnection!;
         return services;
     }
 }

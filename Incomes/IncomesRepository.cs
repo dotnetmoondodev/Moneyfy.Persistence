@@ -1,53 +1,42 @@
-using System.Linq.Expressions;
-using Application.Incomes;
-using Domain.Incomes;
-using Domain;
-using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
-
 namespace Persistence.Incomes;
 
+using Application.Incomes;
+using Domain;
+using Domain.Incomes;
+using Microsoft.EntityFrameworkCore;
+
 public sealed class IncomesRepository(
-    IMongoDatabase database )
+    IAppDbContext appDbContext )
     : IRepository<Income>
 {
-    private readonly IMongoCollection<Income> _dbCollection =
-        database.GetCollection<Income>( nameof( ApiEndpoints.Incomes ) ) ??
-        throw new ArgumentNullException( nameof( database ) );
+    private readonly IAppDbContext _appDbContext = appDbContext ??
+        throw new ArgumentNullException( nameof( appDbContext ) );
 
-    private readonly FilterDefinitionBuilder<Income> _filterBuilder = Builders<Income>.Filter;
+    public async Task<IReadOnlyCollection<Income>> GetAllAsync( CancellationToken cancellationToken )
+    {
+        return await _appDbContext.Incomes.ToListAsync( cancellationToken );
+    }
 
     public async Task<Income?> GetByIdAsync( Guid id, CancellationToken cancellationToken )
     {
-        var filter = _filterBuilder.Eq( entity => entity.Id, id );
-        return await _dbCollection.Find( filter ).FirstOrDefaultAsync( cancellationToken: cancellationToken );
-    }
-
-    public async Task<Income?> GetByIdAsync( Expression<Func<Income, bool>> filter, CancellationToken cancellationToken )
-    {
-        ArgumentNullException.ThrowIfNull( filter );
-        return await _dbCollection.Find( filter ).FirstOrDefaultAsync( cancellationToken );
-    }
-
-    public async Task<IReadOnlyCollection<Income>> GetAllAsync( Expression<Func<Income, bool>>? filter, CancellationToken cancellationToken )
-    {
-        return await _dbCollection.Find( filter ?? _filterBuilder.Empty ).ToListAsync( cancellationToken );
+        return await _appDbContext.Incomes.SingleOrDefaultAsync( e => e.Id == id, cancellationToken );
     }
 
     public async Task AddAsync( Income income, CancellationToken cancellationToken )
     {
-        await _dbCollection.InsertOneAsync( income, cancellationToken: cancellationToken );
+        _appDbContext.Incomes.Add( income );
+        await _appDbContext.SaveChangesAsync( cancellationToken );
     }
 
     public async Task DeleteAsync( Income income, CancellationToken cancellationToken )
     {
-        var filter = _filterBuilder.Eq( entity => entity.Id, income.Id );
-        await _dbCollection.DeleteOneAsync( filter, cancellationToken );
+        _appDbContext.Incomes.Remove( income );
+        await _appDbContext.SaveChangesAsync( cancellationToken );
     }
 
     public async Task UpdateAsync( Income income, CancellationToken cancellationToken )
     {
-        var filter = _filterBuilder.Eq( entity => entity.Id, income.Id );
-        await _dbCollection.ReplaceOneAsync( filter, income, new ReplaceOptions { IsUpsert = false }, cancellationToken );
+        _appDbContext.Incomes.Update( income );
+        await _appDbContext.SaveChangesAsync( cancellationToken );
     }
 }

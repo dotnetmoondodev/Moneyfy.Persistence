@@ -1,24 +1,26 @@
 namespace Persistence.Notifications;
 
-using Domain.Notifications;
+using Application.Notifications;
 using Domain;
+using Domain.Notifications;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
+using Microsoft.Extensions.Hosting;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddPersistenceServices(
         this IServiceCollection services,
         IConfigurationBuilder configuration,
-        bool isProduction )
+        IHostEnvironment hostEnvironment )
     {
-        services.AddCommonServices( configuration, isProduction );
-        services.AddSingleton<IRepository<Notification>>( provider =>
-        {
-            var database = provider.GetService<IMongoDatabase>();
-            return new NotificationsRepository( database! );
-        } );
+        services.AddCommonServices( configuration, hostEnvironment, out var dbConnStr )
+            .AddDbContext<NotificationsDbContext>( options =>
+                options.UseSqlServer( dbConnStr, opt => opt.MigrationsAssembly( Constants.ThisAssemblyName ) ) );
+
+        services.AddScoped<IAppDbContext>( provider => provider.GetRequiredService<NotificationsDbContext>() );
+        services.AddScoped<IRepository<Notification>, NotificationsRepository>();
 
         return services;
     }

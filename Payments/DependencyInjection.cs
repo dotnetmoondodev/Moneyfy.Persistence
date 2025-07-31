@@ -1,24 +1,26 @@
 namespace Persistence.Payments;
 
-using Domain.Payments;
+using Application.Payments;
 using Domain;
+using Domain.Payments;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
+using Microsoft.Extensions.Hosting;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddPersistenceServices(
         this IServiceCollection services,
         IConfigurationBuilder configuration,
-        bool isProduction )
+        IHostEnvironment hostEnvironment )
     {
-        services.AddCommonServices( configuration, isProduction );
-        services.AddSingleton<IRepository<Payment>>( provider =>
-        {
-            var database = provider.GetService<IMongoDatabase>();
-            return new PaymentsRepository( database! );
-        } );
+        services.AddCommonServices( configuration, hostEnvironment, out var dbConnStr )
+            .AddDbContext<PaymentsDbContext>( options =>
+                options.UseSqlServer( dbConnStr, opt => opt.MigrationsAssembly( Constants.ThisAssemblyName ) ) );
+
+        services.AddScoped<IAppDbContext>( provider => provider.GetRequiredService<PaymentsDbContext>() );
+        services.AddScoped<IRepository<Payment>, PaymentsRepository>();
 
         return services;
     }
