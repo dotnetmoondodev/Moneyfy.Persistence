@@ -15,13 +15,13 @@ public class HttpLoggingMiddleware(
     public async Task InvokeAsync( HttpContext context )
     {
         var stopwatch = Stopwatch.StartNew();
-        _logger.LogInformation( "Request( Method: {Method}, Path: {Path}, Query: {Query}, QueryString: {QueryStr} )",
+        _logger.LogInformation( "==> Request( Method: {Method}, Path: {Path}, Query: {Query}, QueryString: {QueryStr} )",
             context.Request.Method, context.Request.Path, context.Request.Query, context.Request.QueryString );
 
         await _next( context );
 
         stopwatch.Stop();
-        _logger.LogInformation( "Response( StatusCode: {StatusCode}, Taken: {ElapsedTime}ms )",
+        _logger.LogInformation( "<== Response( StatusCode: {StatusCode}, Taken: {ElapsedTime}ms )",
             context.Response.StatusCode, stopwatch.ElapsedMilliseconds );
     }
 }
